@@ -8,9 +8,10 @@
     "Restricciones": 437,
     "S-boxes Activas (n)": "1 (Óptimo)",
     "Desglose Ronda": "[1]",
-    "P_total": "2^{-2} = 0.2500",
-    "Pares Necesarios": "2^2",
+    "P_total": "2^{-2} = 0.25000000",
+    "Pares Necesarios": "2^2 = 4",
     "sol_status_raw": "1 (Optimal)",
+    "Certificación": "Óptimo certificado",
     "Tiempo (s)": 1.05
   },
   {
@@ -22,9 +23,10 @@
     "Restricciones": 872,
     "S-boxes Activas (n)": "4 (Óptimo)",
     "Desglose Ronda": "[2, 2]",
-    "P_total": "2^{-4} = 0.0625",
-    "Pares Necesarios": "2^4",
+    "P_total": "2^{-8} = 0.00390625",
+    "Pares Necesarios": "2^8 = 256",
     "sol_status_raw": "1 (Optimal)",
+    "Certificación": "Óptimo certificado",
     "Tiempo (s)": 50.35
   },
   {
@@ -37,8 +39,9 @@
     "S-boxes Activas (n)": "Not Solved (cota <= 11)",
     "Desglose Ronda": "N/A",
     "P_total": ">= 2^{-22}",
-    "Pares Necesarios": ">= 2^{22}",
+    "Pares Necesarios": ">= 2^22",
     "sol_status_raw": "2 (Feasible)",
+    "Certificación": "Cota (timeout)",
     "Tiempo (s)": 180.05
   },
   {
@@ -50,9 +53,10 @@
     "Restricciones": 847,
     "S-boxes Activas (n)": "2 (Óptimo)",
     "Desglose Ronda": "[2]",
-    "P_total": "2^{-4}",
-    "Pares Necesarios": "2^4",
-    "sol_status_raw": "1",
+    "P_total": "2^{-4} = 0.06250000",
+    "Pares Necesarios": "2^4 = 16",
+    "sol_status_raw": "1 (Optimal)",
+    "Certificación": "Óptimo certificado",
     "Tiempo (s)": 3.25
   },
   {
@@ -64,9 +68,10 @@
     "Restricciones": 1692,
     "S-boxes Activas (n)": "4 (Óptimo)",
     "Desglose Ronda": "[2, 2]",
-    "P_total": "2^{-8}",
-    "Pares Necesarios": "2^8",
-    "sol_status_raw": "1",
+    "P_total": "2^{-8} = 0.00390625",
+    "Pares Necesarios": "2^8 = 256",
+    "sol_status_raw": "1 (Optimal)",
+    "Certificación": "Óptimo certificado",
     "Tiempo (s)": 13.76
   },
   {
@@ -76,11 +81,12 @@
     "z": 1,
     "Variables": 445,
     "Restricciones": 2537,
-    "S-boxes Activas (n)": "Not Solved (cota <= 0)",
+    "S-boxes Activas (n)": "Not Solved (N/D - sin solución factible)",
     "Desglose Ronda": "N/A",
-    "P_total": "N/A",
-    "Pares Necesarios": "N/A",
-    "sol_status_raw": "0",
+    "P_total": "N/D",
+    "Pares Necesarios": "N/D",
+    "sol_status_raw": "0 (No Sol)",
+    "Certificación": "Sin sol. factible",
     "Tiempo (s)": 179.9
   }
 ]

@@ -77,18 +77,18 @@ def build_ligero(prob, S, rounds, lanes, bits, new_temp_var):
     for r in range(rounds):
         for x in range(lanes):
             for z in range(bits):
-                P[(r, x, z)] = pulp.LpVariable("P_{}_{}_{}".format(r, x, z), cat="Binary")
+                P[(r, x, z)] = pulp.LpVariable("P_{}_{}_{}" .format(r, x, z), cat="Binary")
                 for y in range(lanes):
-                    Intra[(r, x, y, z)] = pulp.LpVariable("Intra_{}_{}_{}_{}".format(r, x, y, z), cat="Binary")
-                    SigmaOut[(r, x, y, z)] = pulp.LpVariable("SigOut_{}_{}_{}_{}".format(r, x, y, z), cat="Binary")
-                    Chi_input[(r, x, y, z)] = pulp.LpVariable("ChiIn_{}_{}_{}_{}".format(r, x, y, z), cat="Binary")
+                    Intra[(r, x, y, z)] = pulp.LpVariable("Intra_{}_{}_{}_{}" .format(r, x, y, z), cat="Binary")
+                    SigmaOut[(r, x, y, z)] = pulp.LpVariable("SigOut_{}_{}_{}_{}" .format(r, x, y, z), cat="Binary")
+                    Chi_input[(r, x, y, z)] = pulp.LpVariable("ChiIn_{}_{}_{}_{}" .format(r, x, y, z), cat="Binary")
 
         for y in range(lanes):
             for z in range(bits):
-                Chi_active[(r, y, z)] = pulp.LpVariable("Chi_active_{}_{}_{}".format(r, y, z), cat="Binary")
+                Chi_active[(r, y, z)] = pulp.LpVariable("Chi_active_{}_{}_{}" .format(r, y, z), cat="Binary")
                 for i in range(lanes):
-                    A_pre[(r, i, y, z)]   = pulp.LpVariable("Apre_{}_{}_{}_{}".format(r, i, y, z), cat="Binary")
-                    T_and[(r, i, y, z)]   = pulp.LpVariable("Tand_{}_{}_{}_{}".format(r, i, y, z), cat="Binary")
+                    A_pre[(r, i, y, z)]   = pulp.LpVariable("Apre_{}_{}_{}_{}" .format(r, i, y, z), cat="Binary")
+                    T_and[(r, i, y, z)]   = pulp.LpVariable("Tand_{}_{}_{}_{}" .format(r, i, y, z), cat="Binary")
 
     nvars_extra = len(Intra) + len(P) + len(SigmaOut) + len(Chi_input) + len(Chi_active) + len(A_pre) + len(T_and)
     print("  Variables intermedias (Σ''_ligero): {}".format(nvars_extra))
@@ -189,7 +189,7 @@ def main():
         for x in range(lanes):
             for y in range(lanes):
                 for z in range(bits):
-                    S[(r, x, y, z)] = pulp.LpVariable("S_{}_{}_{}_{}".format(r, x, y, z), cat="Binary")
+                    S[(r, x, y, z)] = pulp.LpVariable("S_{}_{}_{}_{}" .format(r, x, y, z), cat="Binary")
 
     print("  Variables de estado S: {}".format(len(S)))
 
@@ -223,7 +223,7 @@ def main():
 
     # Resolver con logPath de manera explícita
     print("\n>>> Resolviendo con {} …".format(args.solver.upper()))
-    
+
     t0 = time.time()
     if args.solver.lower() == "cbc":
         solver = pulp.PULP_CBC_CMD(msg=True, timeLimit=time_limit, gapRel=gap_rel, logPath=log_path)
@@ -235,13 +235,19 @@ def main():
     prob.solve(solver)
     elapsed = time.time() - t0
 
-    # G1/G2 Check
+    # G1/G2 Check — determinación correcta de optimalidad y cota
+    # sol_status == LpSolutionOptimal (=1): óptimo certificado
+    # sol_status == LpSolutionFeasible (=2): solución factible encontrada, no óptima → cota válida
+    # sol_status == 0 (No Sol): CBC no encontró ningún incumbent → sin cota, debe reportarse N/D
     es_optimo = (prob.sol_status == pulp.LpSolutionOptimal)
+    hay_incumbent = (prob.sol_status in (pulp.LpSolutionOptimal, pulp.LpSolutionIntegerFeasible))
     status_str = pulp.LpStatus[prob.status]
     n_valor = pulp.value(prob.objective)
 
+    # G2: solo reportar n si es óptimo; solo reportar cota si hay incumbent factible;
+    # en cualquier otro caso (No Sol), cota_no_certificada = None → se muestra N/D
     n_reportado = round(n_valor) if (n_valor is not None and es_optimo) else None
-    cota = round(n_valor) if (n_valor is not None and not es_optimo) else None
+    cota = round(n_valor) if (n_valor is not None and hay_incumbent and not es_optimo) else None
 
     print("\n" + "=" * 70)
     print("RESULTADOS")
@@ -249,8 +255,12 @@ def main():
     print("  Estado solver:   {}".format(status_str))
     print("  SolStatus crudo: {}".format(prob.sol_status))
     print("  Tiempo:          {:.2f} s".format(elapsed))
-    print("  S-boxes activas: {}".format(n_reportado))
-    print("  Cota superior:   {}".format(cota))
+    if es_optimo:
+        print("  S-boxes activas (ÓPTIMO CERTIFICADO): {}".format(n_reportado))
+    elif hay_incumbent:
+        print("  S-boxes activas (COTA, no certificada): <= {}".format(cota))
+    else:
+        print("  S-boxes activas: N/D (sin solución factible encontrada)")
     print("=" * 70)
 
     detalle_por_ronda = []
@@ -267,7 +277,7 @@ def main():
         detalle_por_ronda = None
 
     p_sbox = 0.25
-    n_final = n_reportado if es_optimo else cota
+    n_final = n_reportado if es_optimo else cota  # None si No Sol
     prob_total = (p_sbox ** n_final) if n_final is not None else None
     pares_necesarios = (1.0 / prob_total) if prob_total else None
     log2_pares = math.log2(pares_necesarios) if pares_necesarios and pares_necesarios > 0 else None
@@ -278,8 +288,9 @@ def main():
         "sol_status_raw":       str(prob.sol_status),
         "status_raw":           str(prob.status),
         "es_optimo_certificado": es_optimo,
+        "hay_incumbent":        hay_incumbent,   # campo nuevo para distinguir Feasible de No Sol
         "n_certificado":        n_reportado,
-        "cota_no_certificada":  cota,
+        "cota_no_certificada":  cota,            # None cuando No Sol (sol_status=0)
         "tiempo_segundos":      round(elapsed, 4),
         "num_variables":        total_vars,
         "num_restricciones":    total_constraints,
