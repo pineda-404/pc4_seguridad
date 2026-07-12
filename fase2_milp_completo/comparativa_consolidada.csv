@@ -1,7 +1,7 @@
 Exp. ID,Variante,Rondas,z,Variables,Restricciones,S-boxes Activas (n),Desglose Ronda,P_total,Pares Necesarios,sol_status_raw,Certificación,Tiempo (s)
-B-r1-z1,Baseline (Keccak),1,1,70,437,1 (Óptimo),[1],2^{-2} = 0.25000000,2^2 = 4,1 (Optimal),Óptimo certificado,1.05
-B-r2-z1,Baseline (Keccak),2,1,115,872,4 (Óptimo),"[2, 2]",2^{-8} = 0.00390625,2^8 = 256,1 (Optimal),Óptimo certificado,50.35
-B-r3-z1,Baseline (Keccak),3,1,160,1307,Not Solved (cota <= 11),N/A,>= 2^{-22},>= 2^22,2 (Feasible),Cota (timeout),180.05
-M_ligero-r1-z1,"Propuesta (Σ''_ligero + χ')",1,1,165,847,2 (Óptimo),[2],2^{-4} = 0.06250000,2^4 = 16,1 (Optimal),Óptimo certificado,3.25
-M_ligero-r2-z1,"Propuesta (Σ''_ligero + χ')",2,1,305,1692,4 (Óptimo),"[2, 2]",2^{-8} = 0.00390625,2^8 = 256,1 (Optimal),Óptimo certificado,13.76
-M_ligero-r3-z1,"Propuesta (Σ''_ligero + χ')",3,1,445,2537,Not Solved (N/D - sin solución factible),N/A,N/D,N/D,0 (No Sol),Sin sol. factible,179.9
+B-r1-z1,Baseline (Keccak),1,1,70,437,1 (Óptimo),[1],2^{-2} = 0.25000000,2^2 = 4,1 (Optimal),Óptimo certificado,0.75
+B-r2-z1,Baseline (Keccak),2,1,115,872,2 (Óptimo),"[1, 1]",2^{-4} = 0.06250000,2^4 = 16,1 (Optimal),Óptimo certificado,5.46
+B-r3-z1,Baseline (Keccak),3,1,160,1307,3 (Óptimo),"[1, 1, 1]",2^{-6} = 0.01562500,2^6 = 64,1 (Optimal),Óptimo certificado,14.85
+M_ligero-r1-z1,Propuesta (Σ''_ligero + χ'),1,1,165,847,2 (Óptimo),[2],2^{-4} = 0.06250000,2^4 = 16,1 (Optimal),Óptimo certificado,3.25
+M_ligero-r2-z1,Propuesta (Σ''_ligero + χ'),2,1,305,1692,4 (Óptimo),"[2, 2]",2^{-8} = 0.00390625,2^8 = 256,1 (Optimal),Óptimo certificado,13.76
+M_ligero-r3-z1,Propuesta (Σ''_ligero + χ'),3,1,445,2537,Not Solved (N/D - sin solución factible),N/A,N/D,N/D,0 (No Sol),Sin sol. factible,179.9

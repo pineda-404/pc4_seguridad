@@ -33,53 +33,41 @@ def fmt_n(n_val, es_optimo, hay_incumbent, cota):
         return "Not Solved (N/D - sin solución factible)"
 
 def main():
-    base_dir = "/home/pineda/Downloads/Seguridad_Final/PAPER_IEEE/fase2_milp_completo"
-    os.makedirs(base_dir, exist_ok=True)
-
-    # Paths to source JSON files
-    baseline_dir = "/home/pineda/Downloads/Seguridad_Final"
-    proposal_dir = "/home/pineda/Downloads/Seguridad_Final/PAPER_IEEE/fase1_matriz/logs"
+    # Paths dentro del repositorio — sin dependencias externas
+    repo_dir     = os.path.dirname(os.path.abspath(__file__))
+    base_dir     = repo_dir  # los JSON/CSV de salida se guardan aquí
+    baseline_dir = os.path.join(repo_dir, "logs_baseline")
+    proposal_dir = os.path.join(os.path.dirname(repo_dir), "fase1_matriz", "logs")
 
     results = []
 
     # ------------------------------------------------------------------
     # 1. Baseline z=1, rounds=1,2,3
+    # Fuente: JSONs generados por keccak_milp_baseline.py (G1/G2 correcto).
+    # Si el JSON no existe, el script aborta con error explícito — no usa fallbacks.
     # ------------------------------------------------------------------
-    # Nota: el baseline fue corrido con el script original del examen.
-    # Para r=1 y r=2: sol_status certificado como Optimal (verificado en logs).
-    # Para r=3: sol_status=2 (Feasible, no Optimal) → cota <= 11, hay incumbent.
-    # Todos los P_total se recalculan con P_SBOX=0.25 usando n real.
-    baseline_metadata = {
-        1: {"es_optimo": True,  "hay_incumbent": True,  "n_val": 1,  "sol_status_raw": "1 (Optimal)"},
-        2: {"es_optimo": True,  "hay_incumbent": True,  "n_val": 4,  "sol_status_raw": "1 (Optimal)"},
-        3: {"es_optimo": False, "hay_incumbent": True,  "n_val": None, "cota": 11, "sol_status_raw": "2 (Feasible)"},
-    }
-
     for r in [1, 2, 3]:
         path = os.path.join(baseline_dir, f"resultados_keccak_baseline_r{r}_z1.json")
-        meta = baseline_metadata[r]
-        es_optimo = meta["es_optimo"]
-        hay_incumbent = meta["hay_incumbent"]
-        n_val = meta["n_val"]
-        cota = meta.get("cota", None)
+        if not os.path.exists(path):
+            print(f"ERROR: No se encontró {path}")
+            print("  Ejecutar primero keccak_milp_baseline.py para r={1,2,3}.")
+            raise FileNotFoundError(path)
 
-        # Intentar leer datos del JSON si existe
-        vars_count = {1: 70, 2: 115, 3: 160}[r]
-        restr_count = {1: 437, 2: 872, 3: 1307}[r]
-        tiempo = None
-        detalle = None
+        with open(path, "r") as f:
+            data = json.load(f)
 
-        if os.path.exists(path):
-            with open(path, "r") as f:
-                data = json.load(f)
-            vars_count = data.get("num_variables", vars_count)
-            restr_count = data.get("num_restricciones", restr_count)
-            tiempo = round(data.get("tiempo_segundos", 0), 2)
-            detalle = data.get("detalle_por_ronda", None)
-        else:
-            # Valores del examen anterior (certificados manualmente)
-            tiempo = {1: 1.05, 2: 50.35, 3: 180.05}[r]
-            detalle = {1: [1], 2: [2, 2], 3: None}[r]
+        es_optimo    = data.get("es_optimo_certificado", False)
+        hay_incumbent = data.get("hay_incumbent", False)
+        n_val        = data.get("n_certificado", None)
+        cota         = data.get("cota_no_certificada", None)
+        # C1 refuerzo: si No Sol, cota debe ser None
+        if not hay_incumbent:
+            cota = None
+
+        vars_count  = data.get("num_variables", None)
+        restr_count = data.get("num_restricciones", None)
+        tiempo      = round(data.get("tiempo_segundos", 0), 2)
+        detalle     = data.get("detalle_por_ronda", None)
 
         # Calcular P_total y Pares con n real (C2: usar n_val, no r)
         if es_optimo and n_val is not None:
@@ -109,7 +97,7 @@ def main():
             "Desglose Ronda": desglose_str,
             "P_total": p_tot_str,
             "Pares Necesarios": pares_str,
-            "sol_status_raw": meta["sol_status_raw"],
+            "sol_status_raw": f"{data.get('sol_status_raw', '?')} ({'Optimal' if es_optimo else ('Feasible' if hay_incumbent else 'No Sol')})",
             "Certificación": "Óptimo certificado" if es_optimo else ("Cota (timeout)" if hay_incumbent else "Sin sol. factible"),
             "Tiempo (s)": tiempo,
         })

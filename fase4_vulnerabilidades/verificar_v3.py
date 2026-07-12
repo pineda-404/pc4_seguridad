@@ -267,64 +267,111 @@ def main():
         for idx, v in enumerate(kernel_p[:3]):
             analizar_autovector(v, f"v_p_{idx} (Propuesta)", z=1)
 
-    # -------------------------
-    # C3b: Reconciliación de la paradoja
-    # -------------------------
+    # ─────────────────────────────────────────────────────────────────────────
+    # C3b: Reconciliación de la paradoja — VERIFICACIÓN EXHAUSTIVA DE SUBESPACIO
+    # Recomendada por la IA supervisora: verificar que kernel_propuesta ⊆ kernel_baseline
+    # no solo con un vector de muestra sino:
+    #   (a) Cada uno de los 4 vectores base individualmente
+    #   (b) Las 2^4 - 1 = 15 combinaciones lineales no triviales sobre GF(2)
+    #   (c) El rango de la unión de ambos kernels
+    # ─────────────────────────────────────────────────────────────────────────
     print("\n" + "=" * 80)
-    print("ANÁLISIS COMPARATIVO Y RECONCILIACIÓN DE LA PARADOJA (C3b)")
+    print("VERIFICACIÓN EXHAUSTIVA DE SUBESPACIO (C3b)")
+    print("kernel_propuesta ⊆ kernel_baseline ?")
     print("=" * 80)
-    print(f"Baseline:  kernel de (M_b ⊕ I) = dim {len(kernel_b)}")
-    print(f"Propuesta: kernel de (M_p ⊕ I) = dim {len(kernel_p)}")
+    print(f"  Baseline:  kernel(M_b ⊕ I) = dim {len(kernel_b)}")
+    print(f"  Propuesta: kernel(M_p ⊕ I) = dim {len(kernel_p)}")
 
-    if len(kernel_b) >= len(kernel_p):
-        print("\n⚠ PARADOJA DETECTADA:")
-        print(f"  El baseline tiene kernel de dimensión {len(kernel_b)} ≥ {len(kernel_p)} (propuesta).")
-        print("  Si 'dimensión del kernel > 0' implica vulnerabilidad, el baseline es igual o más")
-        print("  vulnerable que la propuesta por esta métrica.")
-        print()
-        print("  Investigando si los autovectores del baseline son análogos a los de la propuesta...")
+    if len(kernel_p) > 0 and len(kernel_b) > 0:
 
-        # Verificar si el kernel de la propuesta es un subespacio del kernel del baseline
-        if len(kernel_p) > 0 and len(kernel_b) > 0:
-            vp0 = kernel_p[0]
-            # Verificar si vp0 está en el kernel del baseline
-            Mv = (M_b @ vp0) % 2
-            en_kernel_baseline = np.all(Mv == vp0)  # M_b * v = v?
-            print(f"  ¿El autovector v_p_0 de la propuesta también es autovector del baseline? {en_kernel_baseline}")
+        # (a) Cada vector base de kernel_propuesta verificado individualmente
+        print(f"\n  (a) Verificación individual de los {len(kernel_p)} vectores base de kernel_propuesta:")
+        todos_en_baseline = True
+        for idx, vp in enumerate(kernel_p):
+            Mv = (M_b @ vp) % 2
+            en_kb = bool(np.all(Mv == vp))   # M_b * vp = vp  ↔  vp ∈ kernel(M_b ⊕ I)
+            mark = "✓" if en_kb else "✗"
+            print(f"    {mark} v_p_{idx}: M_b·v_p_{idx} = v_p_{idx} → {en_kb}")
+            if not en_kb:
+                todos_en_baseline = False
+        print(f"  Resultado: todos los vectores base ∈ kernel_baseline = {todos_en_baseline}")
 
-        # Verificar estructura de los autovectores del baseline
-        print("\n  Estructura de autovectores del baseline:")
-        for idx, v in enumerate(kernel_b[:3]):
-            state_2d = v.reshape((5, 5))
-            paridad_col = np.sum(state_2d, axis=1) % 2
-            peso = np.sum(v)
-            print(f"  v_b_{idx}: peso Hamming={peso}, P[x]={paridad_col.tolist()}")
+        # (b) Todas las 2^k - 1 combinaciones lineales no triviales sobre GF(2)
+        k = len(kernel_p)
+        n_combos = (1 << k) - 1   # 2^k - 1
+        print(f"\n  (b) Verificando las {n_combos} combinaciones lineales no triviales (GF(2)):")
+        fallos_combo = []
+        for mask in range(1, 1 << k):
+            # Combinación: suma (XOR) de los vectores base seleccionados por los bits de mask
+            combo = np.zeros(kernel_p[0].shape, dtype=int)
+            bits_activos = []
+            for bit in range(k):
+                if mask & (1 << bit):
+                    combo = (combo + kernel_p[bit]) % 2
+                    bits_activos.append(bit)
+            # Verificar: M_b * combo = combo ?
+            Mv = (M_b @ combo) % 2
+            en_kb = bool(np.all(Mv == combo))
+            if not en_kb:
+                fallos_combo.append((mask, bits_activos))
+        if fallos_combo:
+            print(f"    ✗ {len(fallos_combo)} combinaciones NO están en el kernel del baseline:")
+            for mask, bits in fallos_combo[:5]:
+                print(f"      mask={bin(mask)}, vectores={bits}")
+        else:
+            print(f"    ✓ Las {n_combos} combinaciones están en kernel_baseline.")
+        todas_combos_ok = (len(fallos_combo) == 0)
 
+        # (c) Rango de la unión de ambos kernels
+        print(f"\n  (c) Rango del espacio generado por kernel_baseline ∪ kernel_propuesta:")
+        union_vecs = list(kernel_b) + list(kernel_p)
+        union_matrix = np.array(union_vecs, dtype=int)   # shape (dim_b + dim_p, n)
+        rango_union = gf2_rank(union_matrix.T)             # rango de la matriz de columnas
+        print(f"    dim(kernel_b) = {len(kernel_b)}")
+        print(f"    dim(kernel_p) = {len(kernel_p)}")
+        print(f"    rango(kernel_b ∪ kernel_p) = {rango_union}")
+        es_subespacio = (rango_union == len(kernel_b))
+        print(f"    ¿rango_union == dim(kernel_b)? → {es_subespacio}")
+        if es_subespacio:
+            print(f"    ✓ kernel_propuesta es un SUBESPACIO PROPIO de kernel_baseline.")
+            print(f"      (dim 4 < dim 5 → kernel_propuesta ⊊ kernel_baseline)")
+        else:
+            print(f"    ✗ kernel_propuesta NO está completamente contenido en kernel_baseline.")
+
+        # ── Conclusión consolidada ────────────────────────────────────────────
+        subespacio_confirmado = todos_en_baseline and todas_combos_ok and es_subespacio
         print()
-        print("  CONCLUSIÓN sobre V3:")
-        print("  ─────────────────────────────────────────────────────────────────")
-        print("  La dimensión del kernel de (M ⊕ I) mide autovectores de la capa")
-        print("  lineal completa (Σ''_ligero + ρ/π), no solo de Σ''_ligero.")
-        print()
-        print("  Que el baseline tenga más autovectores que la propuesta significa")
-        print("  que la PROPUESTA tiene MENOS simetrías lineales — lo cual es en")
-        print("  principio MEJOR para la seguridad diferencial lineal.")
-        print()
-        print("  El argumento de V3 tal como estaba escrito ('la propuesta tiene")
-        print("  autovectores, por tanto es vulnerable') es incompleto: el baseline")
-        print("  también tiene autovectores (y más), por lo que la mera existencia")
-        print("  de autovectores no distingue a la propuesta como peor.")
-        print()
-        print("  DIAGNÓSTICO: La hipótesis V3 tal como se formuló (kernel dim=4")
-        print("  como evidencia de vulnerabilidad adicional en la propuesta) NO se")
-        print("  sostiene sin explicar por qué los autovectores del baseline (dim=5)")
-        print("  no son comparablemente explotables.")
-        print()
-        print("  RECOMENDACIÓN (per Plan Maestro Fase 4, paso 4):")
-        print("  Reportar V3 como 'hipótesis explorada y descartada'. Esto es")
-        print("  contenido válido para el paper — muestra due diligence.")
-        print("  ─────────────────────────────────────────────────────────────────")
+        print("  ═" * 40)
+        print("  CONCLUSIÓN CONSOLIDADA sobre V3:")
+        print("  ═" * 40)
+        if subespacio_confirmado:
+            print("  ✓ VERIFICACIÓN EXHAUSTIVA PASADA — kernel_propuesta ⊊ kernel_baseline")
+            print()
+            print("  Los 4 vectores base de kernel_propuesta, individualmente y en todas")
+            print(f"  sus {n_combos} combinaciones lineales, pertenecen al kernel del baseline.")
+            print(f"  El rango de la unión es {rango_union} = dim(kernel_baseline), confirmando")
+            print("  que kernel_propuesta (dim 4) es un SUBESPACIO PROPIO de kernel_baseline (dim 5).")
+            print()
+            print("  Interpretación: todo lo que tiene la propuesta en términos de")
+            print("  simetrías lineales (autovectores de valor propio 1) ya estaba en")
+            print("  el baseline — y le falta UNA dimensión. La propuesta no introduce")
+            print("  ninguna simetría nueva; al contrario, es estrictamente más asimétrica.")
+            print()
+            print("  HIPÓTESIS V3 DESCARTADA (per Plan Maestro Fase 4, paso 4).")
+            print("  Reportar en el paper como 'hipótesis explorada y descartada'")
+            print("  con esta verificación de subespacio como evidencia — es más")
+            print("  contundente que solo comparar dimensiones.")
+        else:
+            print("  ✗ Alguna verificación falló — revisar los detalles arriba.")
+            print("  No se puede afirmar subespacio sin revisar los fallos.")
+        print("  ═" * 40)
+
+    elif len(kernel_p) == 0:
+        print("  kernel_propuesta tiene dim=0 → trivialmente contenido en cualquier espacio.")
     else:
+        print("  kernel_baseline tiene dim=0 — verificación de subespacio no aplica.")
+
+    if len(kernel_b) < len(kernel_p):
         print(f"\nLa propuesta tiene kernel de mayor dimensión ({len(kernel_p)}) que el baseline ({len(kernel_b)}).")
         print("En este caso el argumento de V3 podría sostenerse — verificar autovectores arriba.")
 

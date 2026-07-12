@@ -12,7 +12,7 @@
     "Pares Necesarios": "2^2 = 4",
     "sol_status_raw": "1 (Optimal)",
     "Certificación": "Óptimo certificado",
-    "Tiempo (s)": 1.05
+    "Tiempo (s)": 0.75
   },
   {
     "Exp. ID": "B-r2-z1",
@@ -21,13 +21,13 @@
     "z": 1,
     "Variables": 115,
     "Restricciones": 872,
-    "S-boxes Activas (n)": "4 (Óptimo)",
-    "Desglose Ronda": "[2, 2]",
-    "P_total": "2^{-8} = 0.00390625",
-    "Pares Necesarios": "2^8 = 256",
+    "S-boxes Activas (n)": "2 (Óptimo)",
+    "Desglose Ronda": "[1, 1]",
+    "P_total": "2^{-4} = 0.06250000",
+    "Pares Necesarios": "2^4 = 16",
     "sol_status_raw": "1 (Optimal)",
     "Certificación": "Óptimo certificado",
-    "Tiempo (s)": 50.35
+    "Tiempo (s)": 5.46
   },
   {
     "Exp. ID": "B-r3-z1",
@@ -36,13 +36,13 @@
     "z": 1,
     "Variables": 160,
     "Restricciones": 1307,
-    "S-boxes Activas (n)": "Not Solved (cota <= 11)",
-    "Desglose Ronda": "N/A",
-    "P_total": ">= 2^{-22}",
-    "Pares Necesarios": ">= 2^22",
-    "sol_status_raw": "2 (Feasible)",
-    "Certificación": "Cota (timeout)",
-    "Tiempo (s)": 180.05
+    "S-boxes Activas (n)": "3 (Óptimo)",
+    "Desglose Ronda": "[1, 1, 1]",
+    "P_total": "2^{-6} = 0.01562500",
+    "Pares Necesarios": "2^6 = 64",
+    "sol_status_raw": "1 (Optimal)",
+    "Certificación": "Óptimo certificado",
+    "Tiempo (s)": 14.85
   },
   {
     "Exp. ID": "M_ligero-r1-z1",

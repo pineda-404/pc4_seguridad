@@ -1,0 +1,21 @@
+{
+  "variante": "Baseline (Keccak θ + ρ/π + χ)",
+  "z": 1,
+  "rounds": 2,
+  "sol_status_raw": "1",
+  "status_raw": "1",
+  "es_optimo_certificado": true,
+  "hay_incumbent": true,
+  "n_certificado": 2,
+  "cota_no_certificada": null,
+  "tiempo_segundos": 5.462,
+  "num_variables": 115,
+  "num_restricciones": 872,
+  "detalle_por_ronda": [
+    1,
+    1
+  ],
+  "p_sbox": 0.25,
+  "p_total": 0.0625,
+  "log2_pares": 4.0
+}
