@@ -1,0 +1,14 @@
+{
+  "z": 1,
+  "rounds": 3,
+  "sol_status_raw": "0",
+  "status_raw": "0",
+  "es_optimo_certificado": false,
+  "n_certificado": null,
+  "cota_no_certificada": 0,
+  "tiempo_segundos": 179.8967,
+  "num_variables": 445,
+  "num_restricciones": 2537,
+  "p_total": 1.0,
+  "log2_pares": 0.0
+}

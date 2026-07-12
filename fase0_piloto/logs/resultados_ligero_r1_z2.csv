@@ -1,0 +1,2 @@
+z,rounds,sol_status_raw,status_raw,es_optimo_certificado,n_certificado,cota_no_certificada,tiempo_segundos,num_variables,num_restricciones,p_total,log2_pares
+2,1,2,1,False,,2,180.0868,330,1692,0.0625,4.0

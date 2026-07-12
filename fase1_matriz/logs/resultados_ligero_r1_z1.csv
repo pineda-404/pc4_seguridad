@@ -1,0 +1,2 @@
+z,rounds,sol_status_raw,status_raw,es_optimo_certificado,n_certificado,cota_no_certificada,tiempo_segundos,num_variables,num_restricciones,detalle_por_ronda,p_total,log2_pares
+1,1,1,1,True,2,,3.2546,165,847,[2],0.0625,4.0
