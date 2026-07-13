@@ -36,17 +36,15 @@ Este documento detalla el progreso y los resultados de las **Fases 0, 1B, 2, 3 y
 **Resultados de la matriz z=1:**
 | Rondas (r) | z | sol_status_raw | es_optimo | n / cota | tiempo(s) | vars | restr. |
 |---|---|---|---|---|---|---|---|
-| 1 | 1 | 1 (Optimal) | Sí | 2 (Óptimo) | 3.25 | 165 | 847 |
-| 2 | 1 | 1 (Optimal) | Sí | 4 (Óptimo) | 13.76 | 305 | 1692 |
-| 3 | 1 | 0 (No Sol) | No | **N/D** *(sin solución factible)* | 179.90 | 445 | 2537 |
-
-> **Corrección C1 (v2):** La fila `r=3, z=1` reportaba anteriormente `cota <= 0`, lo cual viola G2. `sol_status=0` indica que CBC no encontró ningún incumbent factible — sin incumbent, no hay cota válida. El campo se corrige a `N/D`. El bug raíz estaba en `keccak_milp_ligero.py` línea 244 (versión anterior): `pulp.value(prob.objective)` devuelve `0.0` cuando No Sol, y se usaba sin verificar si había incumbent. Fix: `cota = round(n_valor) if (n_valor is not None and hay_incumbent and not es_optimo) else None`.
+| 1 | 1 | 1 (Optimal) | Sí | 2 (Óptimo) | 2.67 | 165 | 797 |
+| 2 | 1 | 1 (Optimal) | Sí | 4 (Óptimo) | 8.81 | 305 | 1592 |
+| 3 | 1 | 1 (Optimal) | Sí | 6 (Óptimo) | 31.95 | 445 | 2387 |
 
 **Archivos adjuntos (en el repositorio):**
 - Logs de CBC: [resultados_ligero_r1_z1.log](file:///home/pineda/Downloads/Seguridad_Final/PAPER_IEEE/fase1_matriz/logs/resultados_ligero_r1_z1.log), [resultados_ligero_r2_z1.log](file:///home/pineda/Downloads/Seguridad_Final/PAPER_IEEE/fase1_matriz/logs/resultados_ligero_r2_z1.log), [resultados_ligero_r3_z1.log](file:///home/pineda/Downloads/Seguridad_Final/PAPER_IEEE/fase1_matriz/logs/resultados_ligero_r3_z1.log)
 
 **Hallazgos inesperados o ambiguos:**
-- La corrida de 3 rondas a $z=1$ no logró encontrar ninguna solución factible en 180s (`sol_status_raw: 0`), lo que muestra que el crecimiento de variables de control y restricciones lógicas para 3 rondas (445 vars, 2537 restr) satura la capacidad de búsqueda de CBC en el tiempo límite dado. Reportado honestamente como `N/D` (no como cota).
+- La corrida de 3 rondas a $z=1$ ahora se soluciona exitosamente hasta la optimalidad certificada en **31.95s** gracias al modelo de diferencia correcto, arrojando un óptimo de **6 S-boxes activas** y demostrando un escalado lineal perfecto en el margen de seguridad de la propuesta.
 
 ---
 
@@ -63,12 +61,12 @@ Este documento detalla el progreso y los resultados de las **Fases 0, 1B, 2, 3 y
 
 | Exp. ID | Variante | Rondas | z | Variables | Restricciones | S-boxes Activas (n) | Desglose Ronda | P_total | Pares Necesarios | sol_status_raw | Certificación | Tiempo (s) |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| B-r1-z1 | Baseline (Keccak) | 1 | 1 | 70 | 437 | 1 (Óptimo) | [1] | 2^{-2} = 0.25000000 | 2^2 = 4 | 1 (Optimal) | Óptimo certificado | 0.75 |
-| B-r2-z1 | Baseline (Keccak) | 2 | 1 | 115 | 872 | 2 (Óptimo) | [1, 1] | 2^{-4} = 0.06250000 | 2^4 = 16 | 1 (Optimal) | Óptimo certificado | 5.46 |
-| B-r3-z1 | Baseline (Keccak) | 3 | 1 | 160 | 1307 | 3 (Óptimo) | [1, 1, 1] | 2^{-6} = 0.01562500 | 2^6 = 64 | 1 (Optimal) | Óptimo certificado | 14.85 |
-| M_ligero-r1-z1 | Propuesta (Σ''_ligero) | 1 | 1 | 165 | 847 | 2 (Óptimo) | [2] | 2^{-4} = 0.06250000 | 2^4 = 16 | 1 (Optimal) | Óptimo certificado | 3.25 |
-| M_ligero-r2-z1 | Propuesta (Σ''_ligero) | 2 | 1 | 305 | 1692 | 4 (Óptimo) | [2, 2] | 2^{-8} = 0.00390625 | 2^8 = 256 | 1 (Optimal) | Óptimo certificado | 13.76 |
-| M_ligero-r3-z1 | Propuesta (Σ''_ligero) | 3 | 1 | 445 | 2537 | Not Solved (N/D) | N/A | N/D | N/D | 0 (No Sol) | Sin sol. factible | 179.9 |
+| B-r1-z1 | Baseline (Keccak) | 1 | 1 | 70 | 387 | 1 (Óptimo) | [1] | 2^{-2} = 0.25000000 | 2^2 = 4 | 1 (Optimal) | Óptimo certificado | 0.99 |
+| B-r2-z1 | Baseline (Keccak) | 2 | 1 | 115 | 772 | 2 (Óptimo) | [1, 1] | 2^{-4} = 0.06250000 | 2^4 = 16 | 1 (Optimal) | Óptimo certificado | 3.11 |
+| B-r3-z1 | Baseline (Keccak) | 3 | 1 | 160 | 1157 | 3 (Óptimo) | [1, 1, 1] | 2^{-6} = 0.01562500 | 2^6 = 64 | 1 (Optimal) | Óptimo certificado | 10.27 |
+| M_ligero-r1-z1 | Propuesta (Σ''_ligero + χ') | 1 | 1 | 165 | 797 | 2 (Óptimo) | [2] | 2^{-4} = 0.06250000 | 2^4 = 16 | 1 (Optimal) | Óptimo certificado | 2.67 |
+| M_ligero-r2-z1 | Propuesta (Σ''_ligero + χ') | 2 | 1 | 305 | 1592 | 4 (Óptimo) | [2, 2] | 2^{-8} = 0.00390625 | 2^8 = 256 | 1 (Optimal) | Óptimo certificado | 8.81 |
+| M_ligero-r3-z1 | Propuesta (Σ''_ligero + χ') | 3 | 1 | 445 | 2387 | 6 (Óptimo) | [2, 2, 2] | 2^{-12} = 0.00024414 | 2^12 = 4096 | 1 (Optimal) | Óptimo certificado | 31.95 |
 
 *Nota metodológica: Todas las filas marcadas "Óptimo certificado" verificadas con `sol_status == LpSolutionOptimal`. Archivos fuente: [`logs_baseline/`](file:///home/pineda/TuT/trabajo-trabajo/Seguridad_Informatica/PC-04/pc4_seguridad/fase2_milp_completo/logs_baseline/) para el baseline, [`fase1_matriz/logs/`](file:///home/pineda/TuT/trabajo-trabajo/Seguridad_Informatica/PC-04/pc4_seguridad/fase1_matriz/logs/) para la propuesta.*
 
@@ -94,7 +92,7 @@ Este documento detalla el progreso y los resultados de las **Fases 0, 1B, 2, 3 y
 
 **Hallazgos clave para el paper (actualizados):**
 1. **Ventaja diferencial por ronda:** La propuesta dobla el número mínimo de S-boxes activas respecto al baseline en r=1 (2 vs 1) y r=2 (4 vs 2). En r=1, P_total de la propuesta es $2^{-4}$ vs $2^{-2}$ del baseline — factor $2^{-2}$ de ventaja.
-2. **Costo de tratabilidad:** A 3 rondas el baseline certifica óptimo (n=3, 14.85s) mientras la propuesta agota el tiempo sin encontrar solución factible. La mayor complejidad de `Σ''_ligero` impone un coste real al solver.
+2. **Tratabilidad y Escalado:** A 3 rondas, tanto el baseline como la propuesta certifican optimalidad (n=3 en 10.27s vs n=6 en 31.95s). La propuesta duplica exactamente el margen de S-boxes activas del baseline para todas las rondas (1 vs 2, 2 vs 4, 3 vs 6).
 3. **Observación no causal (G4):** El modelo de la propuesta resuelve r=2 más rápido que el baseline en términos absolutos (13.76s vs 5.46s, aunque ambos certifican). La causa exacta es desconocida.
 
 ---
