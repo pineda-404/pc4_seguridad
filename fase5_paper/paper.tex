@@ -55,7 +55,7 @@ A diferencia de la función $\theta$ estándar de Keccak, que mezcla la paridad 
     \end{equation}
 \end{enumerate}
 
-A escala degenerada $z=1$, $\Sigma''_{\text{ligero}}$ requiere únicamente 45 compuertas XOR frente a las 50 compuertas de la capa $\theta$ estándar (una reducción neta del 10\% en lógica de mezcla lineal). Para escalas reales $z > 1$, la mezcla activa intra-lane por XOR incrementa el conteo absoluto de compuertas a $95z$ XORs (frente a $50z$ de Keccak $\theta$). No obstante, este coste adicional se justifica por la eliminación completa de cableado y mezcla diagonal cruzada entre columnas vecinas, reduciendo drásticamente la complejidad física de ruteo bidimensional y el fan-out en el silicio. En la Fig. \ref{fig:estructura} se detalla este flujo.
+A escala degenerada $z=1$, la mezcla intra-lane colapsa a la identidad (ya que los desplazamientos rotacionales modulo 1 eliminan el término XOR), por lo que $\Sigma''_{\text{ligero}}$ requiere únicamente 45 compuertas XOR frente a las 50 de la capa $\theta$ estándar. Para escalas reales $z \ge 2$, la mezcla activa intra-lane requiere compuertas físicas activas, lo que incrementa el conteo total a $95z$ XORs (frente a $50z$ de Keccak $\theta$). No obstante, este coste adicional se justifica en silicio por la eliminación completa de cableado y mezcla diagonal cruzada entre columnas vecinas, reduciendo la complejidad física de ruteo bidimensional y el fan-out en el chip. En la Fig. \ref{fig:estructura} se detalla este flujo.
 
 \begin{figure}[t]
 \centering
@@ -107,13 +107,13 @@ En la Tabla \ref{tab:consolidado} se detallan los óptimos globales certificados
 \toprule
 \textbf{Exp. ID} & \textbf{Variante} & \textbf{Rondas} & \textbf{Variables} & \textbf{Restricciones} & \textbf{S-boxes ($n$)} & \textbf{P\_total} & \textbf{Pares} & \textbf{Tiempo (s)} \\
 \midrule
-B-r1-z1 & Baseline (Keccak) & 1 & 70 & 387 & 1 (Óptimo) & $2^{-2}$ & $2^2$ & 0.99 \\
-B-r2-z1 & Baseline (Keccak) & 2 & 115 & 772 & 2 (Óptimo) & $2^{-4}$ & $2^4$ & 3.11 \\
-B-r3-z1 & Baseline (Keccak) & 3 & 160 & 1157 & 3 (Óptimo) & $2^{-6}$ & $2^6$ & 10.27 \\
+B-r1-z1 & Baseline (Keccak) & 1 & 160 & 387 & 1 (Óptimo) & $2^{-2}$ & $2^2$ & 0.99 \\
+B-r2-z1 & Baseline (Keccak) & 2 & 295 & 772 & 2 (Óptimo) & $2^{-4}$ & $2^4$ & 3.11 \\
+B-r3-z1 & Baseline (Keccak) & 3 & 430 & 1157 & 3 (Óptimo) & $2^{-6}$ & $2^6$ & 10.27 \\
 \midrule
-M-r1-z1 & Propuesta ($\Sigma''_{\text{ligero}}$) & 1 & 165 & 797 & 2 (Óptimo) & $2^{-4}$ & $2^4$ & 2.67 \\
-M-r2-z1 & Propuesta ($\Sigma''_{\text{ligero}}$) & 2 & 305 & 1592 & 4 (Óptimo) & $2^{-8}$ & $2^8$ & 8.81 \\
-M-r3-z1 & Propuesta ($\Sigma''_{\text{ligero}}$) & 3 & 445 & 2387 & 6 (Óptimo) & $2^{-12}$ & $2^{12}$ & 31.95 \\
+M-r1-z1 & Propuesta ($\Sigma''_{\text{ligero}}$) & 1 & 300 & 797 & 2 (Óptimo) & $2^{-4}$ & $2^4$ & 2.67 \\
+M-r2-z1 & Propuesta ($\Sigma''_{\text{ligero}}$) & 2 & 575 & 1592 & 4 (Óptimo) & $2^{-8}$ & $2^8$ & 8.81 \\
+M-r3-z1 & Propuesta ($\Sigma''_{\text{ligero}}$) & 3 & 850 & 2387 & 6 (Óptimo) & $2^{-12}$ & $2^{12}$ & 31.95 \\
 \bottomrule
 \end{tabular}
 \end{table*}
@@ -143,6 +143,9 @@ Analizamos tres vulnerabilidades críticas identificadas en auditorías previas:
 Dado que la permutación $\pi$ de Keccak se define como $\pi(x, y) = ((x + 3y) \bmod 5, y)$, esta preserva estrictamente el índice de fila $y$ ($y' = y$). En $\Sigma''_{\text{ligero}}$, la mezcla lineal sólo acopla filas distintas a través del término global de paridad de columna $P(x, z)$. 
 
 Si un estado diferencial inicial posee una paridad nula en todas las columnas ($P(x, z) = 0$), la capa lineal actúa como la identidad respecto a la mezcla de filas, y el estado se propaga sin difusión vertical. Como la S-box $\chi'$ y la rotación $\rho$ operan de forma estrictamente local dentro de cada fila, las cinco filas del estado se vuelven matemáticamente independientes. Esto genera una vulnerabilidad estructural de periodo 2 (ej. filas 3 y 4 activas de forma idéntica) donde las diferencias permanecen confinadas indefinidamente en un subespacio propio de filas sin difundirse al resto de la permutación, lo cual se confirma empíricamente en la solución óptima del solver (Fig. \ref{fig:trail}).
+
+\paragraph{Implicaciones en la seguridad práctica}
+A primera vista, el óptimo de $n=6$ obtenido por el solver MILP sugiere una probabilidad diferencial máxima de $2^{-12}$, lo cual duplica la seguridad teórica del baseline ($n=3$, $2^{-6}$). Sin embargo, la persistencia de esta trayectoria en el subespacio de las filas 3 y 4 matiza significativamente esta conclusión. Dado que la permutación carece de mezcla inter-filas en este subespacio, un atacante no necesita analizar el estado completo de 25 bits, sino que puede restringir el análisis de diferencias a un subestado simplificado de 10 bits. Esto reduce la complejidad real del ataque diferencial, anulando parcialmente la ventaja teórica obtenida por la duplicación del número de S-boxes activas. Por lo tanto, aunque la métrica formal $n$ es óptima para el modelo completo, la vulnerabilidad de independencia de filas (V1) debilita la seguridad de la propuesta en la práctica.
 
 \subsection{V2: Canal Lateral de Tiempo por Regla de Piso de Rondas Dinámicas}
 La variante modificada del algoritmo Keccak introduce un esquema de seguridad adaptativo donde el número de rondas se calcula dinámicamente a partir de un parámetro público de intentos de autenticación:
