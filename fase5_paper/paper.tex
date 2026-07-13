@@ -55,7 +55,7 @@ A diferencia de la función $\theta$ estándar de Keccak, que mezcla la paridad 
     \end{equation}
 \end{enumerate}
 
-Esta simplificación reduce drásticamente el fan-out y el número de compuertas XOR necesarias para la difusión lineal. En la Fig. \ref{fig:estructura} se detalla este flujo.
+A escala degenerada $z=1$, $\Sigma''_{\text{ligero}}$ requiere únicamente 45 compuertas XOR frente a las 50 compuertas de la capa $\theta$ estándar (una reducción neta del 10\% en lógica de mezcla lineal). Para escalas reales $z > 1$, la mezcla activa intra-lane por XOR incrementa el conteo absoluto de compuertas a $95z$ XORs (frente a $50z$ de Keccak $\theta$). No obstante, este coste adicional se justifica por la eliminación completa de cableado y mezcla diagonal cruzada entre columnas vecinas, reduciendo drásticamente la complejidad física de ruteo bidimensional y el fan-out en el silicio. En la Fig. \ref{fig:estructura} se detalla este flujo.
 
 \begin{figure}[t]
 \centering
@@ -139,11 +139,13 @@ La Fig. \ref{fig:trail} visualiza la solución óptima del trail obtenida direct
 \section{Análisis de Seguridad y Vulnerabilidades}
 Analizamos tres vulnerabilidades críticas identificadas en auditorías previas:
 
-\subsection{V1: Vulnerabilidad de Bloques Diagonales}
-Al eliminar la paridad de filas en $\Sigma''_{\text{ligero}}$, la difusión horizontal se reduce. No obstante, la estructura permutativa de $\pi$ y los offsets de $\rho$ (incluso degenerados a modulo 1) rompen la formación de sub-bloques independientes a lo largo de las rondas, garantizando que el estado completo se mezcle en $R \ge 2$.
+\subsection{V1: Vulnerabilidad de Independencia de Filas (Row Independence)}
+Dado que la permutación $\pi$ de Keccak se define como $\pi(x, y) = ((x + 3y) \bmod 5, y)$, esta preserva estrictamente el índice de fila $y$ ($y' = y$). En $\Sigma''_{\text{ligero}}$, la mezcla lineal sólo acopla filas distintas a través del término global de paridad de columna $P(x, z)$. 
 
-\subsection{V2: Canal Lateral de Tiempo por Regla de Piso}
-La inyección de constantes o alineación lógica no lineal podría inducir dependencias de datos en el tiempo de cómputo del solver. En el entorno real, todas las operaciones de la propuesta (XORs y NOT-ANDs) se ejecutan en tiempo constante bit-sliced en hardware, eliminando fugas temporales de canal lateral.
+Si un estado diferencial inicial posee una paridad nula en todas las columnas ($P(x, z) = 0$), la capa lineal actúa como la identidad respecto a la mezcla de filas, y el estado se propaga sin difusión vertical. Como la S-box $\chi'$ y la rotación $\rho$ operan de forma estrictamente local dentro de cada fila, las cinco filas del estado se vuelven matemáticamente independientes. Esto genera una vulnerabilidad estructural de periodo 2 (ej. filas 3 y 4 activas de forma idéntica) donde las diferencias permanecen confinadas indefinidamente en un subespacio propio de filas sin difundirse al resto de la permutación, lo cual se confirma empíricamente en la solución óptima del solver (Fig. \ref{fig:trail}).
+
+\subsection{V2: Resistencia contra Canales Laterales de Potencia (DPA) mediante Enmascaramiento}
+En implementaciones físicas para IoT, la resistencia contra ataques de análisis de potencia diferencial (DPA) es crítica. El reemplazo de la S-box $\chi$ de Keccak por la S-box $\chi'$ de ASCON se justifica por la compatibilidad de esta última con esquemas de enmascaramiento por hardware (threshold implementations). Debido al balance de las funciones coordenadas cuadráticas de $\chi'$, es posible implementar enmascaramientos de primer orden con un número reducido de acciones aleatorias adicionales (sharing), mitigando fugas físicas de canal lateral con menor sobrecoste de área frente a alternativas de mayor profundidad AND como PRESENT o GIFT.
 
 \subsection{V3: Simetrías Lineales por Subespacios Invariantes}
 Evaluamos formalmente si la propuesta introduce nuevos subespacios lineales invariantes (autovectores) en la matriz lineal de mezcla $M$. Construyendo la matriz en $\mathbb{F}_2^{25 \times 25}$ a $z=1$ y calculando el kernel de $M \oplus I$, encontramos:
