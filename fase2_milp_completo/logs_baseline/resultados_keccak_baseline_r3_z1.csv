@@ -1,2 +1,2 @@
 variante,z,rounds,sol_status_raw,status_raw,es_optimo_certificado,hay_incumbent,n_certificado,cota_no_certificada,tiempo_segundos,num_variables,num_restricciones,detalle_por_ronda,p_sbox,p_total,log2_pares
-Baseline (Keccak θ + ρ/π + χ),1,3,1,1,True,True,3,,14.8474,160,1307,"[1, 1, 1]",0.25,0.015625,6.0
+Baseline (Keccak θ + ρ/π + χ),1,3,1,1,True,True,3,,10.2724,160,1157,"[1, 1, 1]",0.25,0.015625,6.0

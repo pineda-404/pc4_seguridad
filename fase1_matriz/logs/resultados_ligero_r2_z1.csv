@@ -1,2 +1,2 @@
-z,rounds,sol_status_raw,status_raw,es_optimo_certificado,n_certificado,cota_no_certificada,tiempo_segundos,num_variables,num_restricciones,detalle_por_ronda,p_total,log2_pares
-1,2,1,1,True,4,,13.7594,305,1692,"[2, 2]",0.00390625,8.0
+z,rounds,sol_status_raw,status_raw,es_optimo_certificado,hay_incumbent,n_certificado,cota_no_certificada,tiempo_segundos,num_variables,num_restricciones,detalle_por_ronda,p_total,log2_pares
+1,2,1,1,True,True,4,,8.8132,305,1592,"[2, 2]",0.00390625,8.0

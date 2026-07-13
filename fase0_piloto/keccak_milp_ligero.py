@@ -44,9 +44,8 @@ def add_xor_n(prob, inputs, output, new_temp_var_fn):
     prob += output == current
 
 def add_not_and(prob, a, b, t):
-    prob += t <= b
-    prob += t + a <= 1
-    prob += t - b + a >= 0
+    """t <= a + b (Correct differential model for AND gate)"""
+    prob += t <= a + b
 
 def add_or(prob, inputs, output):
     if len(inputs) == 0:

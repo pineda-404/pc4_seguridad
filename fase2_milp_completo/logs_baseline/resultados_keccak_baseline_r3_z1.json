@@ -8,9 +8,9 @@
   "hay_incumbent": true,
   "n_certificado": 3,
   "cota_no_certificada": null,
-  "tiempo_segundos": 14.8474,
+  "tiempo_segundos": 10.2724,
   "num_variables": 160,
-  "num_restricciones": 1307,
+  "num_restricciones": 1157,
   "detalle_por_ronda": [
     1,
     1,

@@ -4,11 +4,12 @@
   "sol_status_raw": "1",
   "status_raw": "1",
   "es_optimo_certificado": true,
+  "hay_incumbent": true,
   "n_certificado": 4,
   "cota_no_certificada": null,
-  "tiempo_segundos": 13.7594,
+  "tiempo_segundos": 8.8132,
   "num_variables": 305,
-  "num_restricciones": 1692,
+  "num_restricciones": 1592,
   "detalle_por_ronda": [
     2,
     2

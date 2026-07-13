@@ -5,14 +5,14 @@
     "Rondas": 1,
     "z": 1,
     "Variables": 70,
-    "Restricciones": 437,
+    "Restricciones": 387,
     "S-boxes Activas (n)": "1 (Óptimo)",
     "Desglose Ronda": "[1]",
     "P_total": "2^{-2} = 0.25000000",
     "Pares Necesarios": "2^2 = 4",
     "sol_status_raw": "1 (Optimal)",
     "Certificación": "Óptimo certificado",
-    "Tiempo (s)": 0.75
+    "Tiempo (s)": 0.99
   },
   {
     "Exp. ID": "B-r2-z1",
@@ -20,14 +20,14 @@
     "Rondas": 2,
     "z": 1,
     "Variables": 115,
-    "Restricciones": 872,
+    "Restricciones": 772,
     "S-boxes Activas (n)": "2 (Óptimo)",
     "Desglose Ronda": "[1, 1]",
     "P_total": "2^{-4} = 0.06250000",
     "Pares Necesarios": "2^4 = 16",
     "sol_status_raw": "1 (Optimal)",
     "Certificación": "Óptimo certificado",
-    "Tiempo (s)": 5.46
+    "Tiempo (s)": 3.11
   },
   {
     "Exp. ID": "B-r3-z1",
@@ -35,14 +35,14 @@
     "Rondas": 3,
     "z": 1,
     "Variables": 160,
-    "Restricciones": 1307,
+    "Restricciones": 1157,
     "S-boxes Activas (n)": "3 (Óptimo)",
     "Desglose Ronda": "[1, 1, 1]",
     "P_total": "2^{-6} = 0.01562500",
     "Pares Necesarios": "2^6 = 64",
     "sol_status_raw": "1 (Optimal)",
     "Certificación": "Óptimo certificado",
-    "Tiempo (s)": 14.85
+    "Tiempo (s)": 10.27
   },
   {
     "Exp. ID": "M_ligero-r1-z1",
@@ -50,14 +50,14 @@
     "Rondas": 1,
     "z": 1,
     "Variables": 165,
-    "Restricciones": 847,
+    "Restricciones": 797,
     "S-boxes Activas (n)": "2 (Óptimo)",
     "Desglose Ronda": "[2]",
     "P_total": "2^{-4} = 0.06250000",
     "Pares Necesarios": "2^4 = 16",
     "sol_status_raw": "1 (Optimal)",
     "Certificación": "Óptimo certificado",
-    "Tiempo (s)": 3.25
+    "Tiempo (s)": 2.67
   },
   {
     "Exp. ID": "M_ligero-r2-z1",
@@ -65,14 +65,14 @@
     "Rondas": 2,
     "z": 1,
     "Variables": 305,
-    "Restricciones": 1692,
+    "Restricciones": 1592,
     "S-boxes Activas (n)": "4 (Óptimo)",
     "Desglose Ronda": "[2, 2]",
     "P_total": "2^{-8} = 0.00390625",
     "Pares Necesarios": "2^8 = 256",
     "sol_status_raw": "1 (Optimal)",
     "Certificación": "Óptimo certificado",
-    "Tiempo (s)": 13.76
+    "Tiempo (s)": 8.81
   },
   {
     "Exp. ID": "M_ligero-r3-z1",
@@ -80,13 +80,13 @@
     "Rondas": 3,
     "z": 1,
     "Variables": 445,
-    "Restricciones": 2537,
-    "S-boxes Activas (n)": "Not Solved (N/D - sin solución factible)",
-    "Desglose Ronda": "N/A",
-    "P_total": "N/D",
-    "Pares Necesarios": "N/D",
-    "sol_status_raw": "0 (No Sol)",
-    "Certificación": "Sin sol. factible",
-    "Tiempo (s)": 179.9
+    "Restricciones": 2387,
+    "S-boxes Activas (n)": "6 (Óptimo)",
+    "Desglose Ronda": "[2, 2, 2]",
+    "P_total": "2^{-12} = 0.00024414",
+    "Pares Necesarios": "2^12 = 4096",
+    "sol_status_raw": "1 (Optimal)",
+    "Certificación": "Óptimo certificado",
+    "Tiempo (s)": 31.95
   }
 ]
