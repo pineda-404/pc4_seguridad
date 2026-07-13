@@ -76,7 +76,7 @@ Para determinar el número mínimo de S-boxes activas ($n$) y certificar la segu
 \subsection{Linealización Correcta del AND Diferencial}
 En modelos MILP previos del proyecto, la compuerta AND no lineal de la S-box ($t = a \wedge b$) se modeló asumiendo una relación de valor real ($t = a \cdot b$), forzando $t=1$ si y solo si $a=1 \wedge b=1$. 
 
-Sin embargo, en criptoanálisis diferencial, las variables representan diferencias ($\Delta$). Dado que la negación es afín ($\Delta(\neg x) = \Delta x$), la negación no afecta la propagación. Más aún, una compuerta AND puede propagar una diferencia a su salida con probabilidad $0.5$ si **al menos una** de sus entradas tiene diferencia (dependiendo del valor del bit complementario). La única restricción determinística infranqueable es que si ninguna entrada tiene diferencia ($a=b=0$), la salida tampoco puede tenerla ($t=0$). 
+Sin embargo, en criptoanálisis diferencial, las variables representan diferencias ($\Delta$). Dado que la negación es afín ($\Delta(\neg x) = \Delta x$), la negación no afecta la propagación. Más aún, una compuerta AND puede propagar una diferencia a su salida con probabilidad $0.5$ si \textbf{al menos una} de sus entradas tiene diferencia (dependiendo del valor del bit complementario). La única restricción determinística infranqueable es que si ninguna entrada tiene diferencia ($a=b=0$), la salida tampoco puede tenerla ($t=0$). 
 
 Por lo tanto, la linealización de Mouha et al. \cite{mouha} establece la cota superior correcta para el AND diferencial como:
 \begin{equation}
@@ -122,7 +122,7 @@ M-r3-z1 & Propuesta ($\Sigma''_{\text{ligero}}$) & 3 & 445 & 2387 & 6 (Óptimo) 
 Los resultados muestran que la propuesta duplica de manera exacta el número mínimo de S-boxes activas en todas las rondas ($1 \rightarrow 2$ en $R=1$, $2 \rightarrow 4$ en $R=2$, $3 \rightarrow 6$ en $R=3$). La explicación de este comportamiento es puramente estructural:
 \begin{itemize}
     \item \textbf{En el Baseline:} Un estado con una única fila uniforme activa (peso 5) cancela la paridad de columnas vecinas en $\theta$ ($D[x] = P_c[x-1] \oplus P_c[x+1] = 1 \oplus 1 = 0$), permitiendo un trail estable con solo 1 S-box activa por ronda.
-    \item \textbf{En la Propuesta:} La inyección lineal de paridad es directa ($S[x,y] \oplus P_c[x]$). Un estado de una sola fila activa causaría una dispersión lineal a las otras 4 filas. Para evitar esta difusión y cancelar el término $P_c[x]$, el modelo se ve obligado a activar un número par de filas uniformes. El mínimo par estable es exactamente **2 filas**, lo que fuerza el óptimo de 2 S-boxes activas por ronda.
+    \item \textbf{En la Propuesta:} La inyección lineal de paridad es directa ($S[x,y] \oplus P_c[x]$). Un estado de una sola fila activa causaría una dispersión lineal a las otras 4 filas. Para evitar esta difusión y cancelar el término $P_c[x]$, el modelo se ve obligado a activar un número par de filas uniformes. El mínimo par estable es exactamente \textbf{2 filas}, lo que fuerza el óptimo de 2 S-boxes activas por ronda.
 \end{itemize}
 
 La Fig. \ref{fig:trail} visualiza la solución óptima del trail obtenida directamente de las variables binarias del solver.
